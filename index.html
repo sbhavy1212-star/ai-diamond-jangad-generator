@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M & M DIAMOND</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<style>
+body {
+    font-family: Arial;
+    background: #f4f6f9;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: auto;
+}
+
+h1 {
+    text-align: center;
+}
+
+/* Dashboard */
+.dashboard {
+    display: flex;
+    gap: 10px;
+    margin: 10px 0;
+}
+
+.card {
+    flex: 1;
+    background: white;
+    padding: 10px;
+    text-align: center;
+}
+
+/* Form */
+.form {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin: 10px 0;
+}
+
+input, select {
+    padding: 10px;
+    border: 1px solid #ccc;
+}
+
+button {
+    background: #0077ff;
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+}
+
+button:hover { background:#0055cc; }
+
+.export-btn { background: green; }
+.export-btn:hover { background: darkgreen; }
+
+/* Table */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+th, td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+
+th {
+    background: #0077ff;
+    color: white;
+}
+
+/* Search */
+#searchBox {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+}
+
+.delete {
+    background: red;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>💎 M & M DIAMOND INVENTORY</h1>
+
+<!-- DASHBOARD -->
+<div class="dashboard">
+    <div class="card">
+        <h3>Total Diamonds</h3>
+        <p id="totalDiamonds">0</p>
+    </div>
+    <div class="card">
+        <h3>Total Carat</h3>
+        <p id="totalCarat">0</p>
+    </div>
+    <div class="card">
+        <h3>Total Value ($)</h3>
+        <p id="totalValue">0</p>
+    </div>
+</div>
+
+<!-- SEARCH -->
+<input type="text" id="searchBox" placeholder="🔍 Search by Stock ID..." onkeyup="searchStock()">
+
+<!-- FORM -->
+<div class="form">
+
+<input id="stockId" placeholder="Stock ID">
+
+<select id="availability">
+    <option>Available</option>
+    <option>Sold</option>
+</select>
+
+<input id="shape" placeholder="Shape">
+<input id="crt" type="number" placeholder="CRT">
+<input id="color" placeholder="Color">
+<input id="purity" placeholder="Purity">
+<input id="cut" placeholder="Cut">
+<input id="lab" placeholder="Lab">
+<input id="certNo" placeholder="Certificate No">
+<input id="perCtPrice" type="number" placeholder="Per CT Price">
+
+<button onclick="addDiamond()">Add Diamond</button>
+<button class="export-btn" onclick="exportExcel()">Export Excel</button>
+
+</div>
+
+<!-- TABLE -->
+<table>
+<thead>
+<tr>
+<th>Stock ID</th>
+<th>Availability</th>
+<th>Shape</th>
+<th>CRT</th>
+<th>Color</th>
+<th>Purity</th>
+<th>Cut</th>
+<th>Lab</th>
+<th>Certificate</th>
+<th>Per CT</th>
+<th>Total</th>
+<th>Action</th>
+</tr>
+</thead>
+
+<tbody id="tableBody"></tbody>
+</table>
+
+</div>
+
+<script>
+let diamonds = JSON.parse(localStorage.getItem("diamonds")) || [];
+
+function save(){
+    localStorage.setItem("diamonds", JSON.stringify(diamonds));
+}
+
+/* ADD */
+function addDiamond(){
+
+    const stockId = document.getElementById("stockId").value;
+    const availability = document.getElementById("availability").value;
+    const shape = document.getElementById("shape").value;
+    const crt = Number(document.getElementById("crt").value);
+    const color = document.getElementById("color").value;
+    const purity = document.getElementById("purity").value;
+    const cut = document.getElementById("cut").value;
+    const lab = document.getElementById("lab").value;
+    const certNo = document.getElementById("certNo").value;
+    const perCtPrice = Number(document.getElementById("perCtPrice").value);
+
+    if(!stockId || !crt || !perCtPrice){
+        alert("Fill required fields");
+        return;
+    }
+
+    const totalPrice = crt * perCtPrice;
+
+    diamonds.push({
+        stockId,
+        availability,
+        shape,
+        crt,
+        color,
+        purity,
+        cut,
+        lab,
+        certNo,
+        perCtPrice,
+        totalPrice
+    });
+
+    save();
+    render();
+    clearForm();
+}
+
+/* RENDER */
+function render(){
+    renderFiltered(diamonds);
+}
+
+/* FILTER RENDER */
+function renderFiltered(data){
+
+    const table = document.getElementById("tableBody");
+    table.innerHTML = "";
+
+    let totalCarat = 0;
+    let totalValue = 0;
+
+    data.forEach((d) => {
+
+        totalCarat += d.crt;
+        totalValue += d.totalPrice;
+
+        table.innerHTML += `
+        <tr>
+            <td>${d.stockId}</td>
+            <td>${d.availability}</td>
+            <td>${d.shape}</td>
+            <td>${d.crt}</td>
+            <td>${d.color}</td>
+            <td>${d.purity}</td>
+            <td>${d.cut}</td>
+            <td>${d.lab}</td>
+            <td>${d.certNo}</td>
+            <td>${d.perCtPrice}</td>
+            <td>${d.totalPrice.toFixed(2)}</td>
+            <td><button class="delete" onclick="deleteDiamond('${d.stockId}')">X</button></td>
+        </tr>
+        `;
+    });
+
+    document.getElementById("totalDiamonds").innerText = diamonds.length;
+    document.getElementById("totalCarat").innerText = totalCarat.toFixed(2);
+    document.getElementById("totalValue").innerText = totalValue.toFixed(2);
+}
+
+/* SEARCH */
+function searchStock(){
+
+    const value = document.getElementById("searchBox").value.toLowerCase();
+
+    const filtered = diamonds.filter(d =>
+        d.stockId.toLowerCase().includes(value)
+    );
+
+    renderFiltered(filtered);
+}
+
+/* DELETE */
+function deleteDiamond(stockId){
+
+    diamonds = diamonds.filter(d => d.stockId !== stockId);
+
+    save();
+    render();
+}
+
+/* CLEAR FORM */
+function clearForm(){
+    document.querySelectorAll("input").forEach(i => i.value = "");
+}
+
+/* EXPORT EXCEL */
+function exportExcel(){
+
+    const data = diamonds.map(d => ({
+        "Stock ID": d.stockId,
+        "Availability": d.availability,
+        "Shape": d.shape,
+        "CRT": d.crt,
+        "Color": d.color,
+        "Purity": d.purity,
+        "Cut": d.cut,
+        "Lab": d.lab,
+        "Certificate": d.certNo,
+        "Per CT": d.perCtPrice,
+        "Total": d.totalPrice
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(wb, ws, "Diamonds");
+
+    XLSX.writeFile(wb, "diamond_inventory.xlsx");
+}
+
+render();
+</script>
+
+</body>
+</html>
