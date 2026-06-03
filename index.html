@@ -8,88 +8,289 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 body {
-    font-family: Arial;
-    background: #f4f6f9;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     padding: 20px;
+    min-height: 100vh;
 }
 
 .container {
-    max-width: 1200px;
-    margin: auto;
+    max-width: 1400px;
+    margin: 0 auto;
 }
 
 h1 {
     text-align: center;
+    color: white;
+    margin-bottom: 30px;
+    font-size: 2.5em;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    letter-spacing: 2px;
 }
 
 /* Dashboard */
 .dashboard {
-    display: flex;
-    gap: 10px;
-    margin: 10px 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin: 30px 0;
 }
 
 .card {
-    flex: 1;
     background: white;
-    padding: 10px;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
     text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+}
+
+.card h3 {
+    color: #667eea;
+    font-size: 1.1em;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.card p {
+    font-size: 2.5em;
+    font-weight: bold;
+    color: #764ba2;
+}
+
+/* Search */
+#searchBox {
+    width: 100%;
+    padding: 15px;
+    margin: 20px 0;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 1em;
+    transition: border-color 0.3s ease;
+}
+
+#searchBox:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 /* Form */
 .form {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-    margin: 10px 0;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin: 25px 0;
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
 }
 
 input, select {
-    padding: 10px;
-    border: 1px solid #ccc;
+    padding: 12px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 0.95em;
+    transition: all 0.3s ease;
+    font-family: inherit;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+input::placeholder {
+    color: #999;
 }
 
 button {
-    background: #0077ff;
-    color: white;
+    padding: 12px 20px;
     border: none;
-    padding: 10px;
+    border-radius: 6px;
     cursor: pointer;
+    font-size: 0.95em;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
-button:hover { background:#0055cc; }
+button:active {
+    transform: scale(0.98);
+}
 
-.export-btn { background: green; }
-.export-btn:hover { background: darkgreen; }
+.add-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    grid-column: span 2;
+}
+
+.add-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(102, 126, 234, 0.4);
+}
+
+.export-btn {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    color: white;
+    grid-column: span 2;
+}
+
+.export-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(17, 153, 142, 0.4);
+}
 
 /* Table */
+.table-wrapper {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    overflow-x: auto;
+    margin-top: 30px;
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
     background: white;
 }
 
-th, td {
-    padding: 10px;
-    border: 1px solid #ddd;
-    text-align: center;
-}
-
 th {
-    background: #0077ff;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
+    padding: 15px 10px;
+    text-align: center;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.9em;
+    letter-spacing: 0.5px;
+    position: sticky;
+    top: 0;
 }
 
-/* Search */
-#searchBox {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
+td {
+    padding: 12px 10px;
+    border-bottom: 1px solid #f0f0f0;
+    text-align: center;
+    font-size: 0.95em;
 }
 
-.delete {
-    background: red;
+tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+tbody tr:hover {
+    background-color: #f8f9ff;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* Action Buttons */
+.delete-btn {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    font-size: 0.85em;
+}
+
+.delete-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(245, 87, 108, 0.4);
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 40px;
+    color: #999;
+}
+
+.empty-state p {
+    font-size: 1.1em;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 1.8em;
+    }
+    
+    .form {
+        grid-template-columns: 1fr;
+    }
+    
+    .add-btn, .export-btn {
+        grid-column: span 1;
+    }
+    
+    .dashboard {
+        grid-template-columns: 1fr;
+    }
+    
+    table {
+        font-size: 0.85em;
+    }
+    
+    th, td {
+        padding: 10px 5px;
+    }
+}
+
+/* Toast Notifications */
+.toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #333;
+    color: white;
+    padding: 15px 25px;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    animation: slideIn 0.3s ease;
+    z-index: 1000;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.toast.success {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+}
+
+.toast.error {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
 }
 </style>
 
@@ -109,11 +310,11 @@ th {
     </div>
     <div class="card">
         <h3>Total Carat</h3>
-        <p id="totalCarat">0</p>
+        <p id="totalCarat">0.00</p>
     </div>
     <div class="card">
         <h3>Total Value ($)</h3>
-        <p id="totalValue">0</p>
+        <p id="totalValue">0.00</p>
     </div>
 </div>
 
@@ -123,7 +324,7 @@ th {
 <!-- FORM -->
 <div class="form">
 
-<input id="stockId" placeholder="Stock ID">
+<input id="stockId" placeholder="Stock ID" required>
 
 <select id="availability">
     <option>Available</option>
@@ -131,20 +332,21 @@ th {
 </select>
 
 <input id="shape" placeholder="Shape">
-<input id="crt" type="number" placeholder="CRT">
+<input id="crt" type="number" placeholder="CRT" step="0.01" min="0">
 <input id="color" placeholder="Color">
 <input id="purity" placeholder="Purity">
 <input id="cut" placeholder="Cut">
 <input id="lab" placeholder="Lab">
 <input id="certNo" placeholder="Certificate No">
-<input id="perCtPrice" type="number" placeholder="Per CT Price">
+<input id="perCtPrice" type="number" placeholder="Per CT Price" step="0.01" min="0">
 
-<button onclick="addDiamond()">Add Diamond</button>
+<button class="add-btn" onclick="addDiamond()">Add Diamond</button>
 <button class="export-btn" onclick="exportExcel()">Export Excel</button>
 
 </div>
 
 <!-- TABLE -->
+<div class="table-wrapper">
 <table>
 <thead>
 <tr>
@@ -165,38 +367,80 @@ th {
 
 <tbody id="tableBody"></tbody>
 </table>
+<div id="emptyState" class="empty-state" style="display:none;">
+    <p>No diamonds found. Add one to get started!</p>
+</div>
+</div>
 
 </div>
 
 <script>
 let diamonds = JSON.parse(localStorage.getItem("diamonds")) || [];
+let filteredView = false;
 
 function save(){
     localStorage.setItem("diamonds", JSON.stringify(diamonds));
 }
 
-/* ADD */
-function addDiamond(){
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
 
-    const stockId = document.getElementById("stockId").value;
-    const availability = document.getElementById("availability").value;
-    const shape = document.getElementById("shape").value;
+function validateInputs() {
+    const stockId = document.getElementById("stockId").value.trim();
     const crt = Number(document.getElementById("crt").value);
-    const color = document.getElementById("color").value;
-    const purity = document.getElementById("purity").value;
-    const cut = document.getElementById("cut").value;
-    const lab = document.getElementById("lab").value;
-    const certNo = document.getElementById("certNo").value;
     const perCtPrice = Number(document.getElementById("perCtPrice").value);
 
-    if(!stockId || !crt || !perCtPrice){
-        alert("Fill required fields");
-        return;
+    if (!stockId) {
+        showToast('Stock ID is required!', 'error');
+        return false;
     }
+
+    if (diamonds.some(d => d.stockId === stockId)) {
+        showToast('Stock ID already exists!', 'error');
+        return false;
+    }
+
+    if (!crt || crt <= 0) {
+        showToast('Please enter a valid CRT value!', 'error');
+        return false;
+    }
+
+    if (!perCtPrice || perCtPrice <= 0) {
+        showToast('Please enter a valid Per CT Price!', 'error');
+        return false;
+    }
+
+    return true;
+}
+
+/* ADD */
+function addDiamond(){
+    if (!validateInputs()) return;
+
+    const stockId = document.getElementById("stockId").value.trim();
+    const availability = document.getElementById("availability").value;
+    const shape = document.getElementById("shape").value.trim();
+    const crt = Number(document.getElementById("crt").value);
+    const color = document.getElementById("color").value.trim();
+    const purity = document.getElementById("purity").value.trim();
+    const cut = document.getElementById("cut").value.trim();
+    const lab = document.getElementById("lab").value.trim();
+    const certNo = document.getElementById("certNo").value.trim();
+    const perCtPrice = Number(document.getElementById("perCtPrice").value);
 
     const totalPrice = crt * perCtPrice;
 
     diamonds.push({
+        id: Date.now(),
         stockId,
         availability,
         shape,
@@ -213,41 +457,53 @@ function addDiamond(){
     save();
     render();
     clearForm();
+    showToast(`Diamond ${stockId} added successfully!`);
 }
 
 /* RENDER */
 function render(){
     renderFiltered(diamonds);
+    filteredView = false;
 }
 
 /* FILTER RENDER */
 function renderFiltered(data){
-
     const table = document.getElementById("tableBody");
+    const emptyState = document.getElementById("emptyState");
+    
     table.innerHTML = "";
+
+    if (data.length === 0) {
+        emptyState.style.display = 'block';
+        document.getElementById("totalDiamonds").innerText = '0';
+        document.getElementById("totalCarat").innerText = '0.00';
+        document.getElementById("totalValue").innerText = '0.00';
+        return;
+    }
+
+    emptyState.style.display = 'none';
 
     let totalCarat = 0;
     let totalValue = 0;
 
     data.forEach((d) => {
-
         totalCarat += d.crt;
         totalValue += d.totalPrice;
 
         table.innerHTML += `
         <tr>
             <td>${d.stockId}</td>
-            <td>${d.availability}</td>
-            <td>${d.shape}</td>
-            <td>${d.crt}</td>
-            <td>${d.color}</td>
-            <td>${d.purity}</td>
-            <td>${d.cut}</td>
-            <td>${d.lab}</td>
-            <td>${d.certNo}</td>
-            <td>${d.perCtPrice}</td>
-            <td>${d.totalPrice.toFixed(2)}</td>
-            <td><button class="delete" onclick="deleteDiamond('${d.stockId}')">X</button></td>
+            <td><span class="badge ${d.availability.toLowerCase()}">${d.availability}</span></td>
+            <td>${d.shape || '-'}</td>
+            <td>${d.crt.toFixed(2)}</td>
+            <td>${d.color || '-'}</td>
+            <td>${d.purity || '-'}</td>
+            <td>${d.cut || '-'}</td>
+            <td>${d.lab || '-'}</td>
+            <td>${d.certNo || '-'}</td>
+            <td>$${d.perCtPrice.toFixed(2)}</td>
+            <td>$${d.totalPrice.toFixed(2)}</td>
+            <td><button class="delete-btn" onclick="deleteDiamond('${d.stockId}')">Delete</button></td>
         </tr>
         `;
     });
@@ -259,55 +515,93 @@ function renderFiltered(data){
 
 /* SEARCH */
 function searchStock(){
+    const value = document.getElementById("searchBox").value.toLowerCase().trim();
 
-    const value = document.getElementById("searchBox").value.toLowerCase();
+    if (!value) {
+        render();
+        return;
+    }
 
     const filtered = diamonds.filter(d =>
-        d.stockId.toLowerCase().includes(value)
+        d.stockId.toLowerCase().includes(value) ||
+        d.shape.toLowerCase().includes(value) ||
+        d.color.toLowerCase().includes(value)
     );
 
     renderFiltered(filtered);
+    filteredView = true;
 }
 
 /* DELETE */
 function deleteDiamond(stockId){
+    if (!confirm(`Are you sure you want to delete ${stockId}?`)) return;
 
     diamonds = diamonds.filter(d => d.stockId !== stockId);
 
     save();
     render();
+    showToast(`Diamond ${stockId} deleted!`);
 }
 
 /* CLEAR FORM */
 function clearForm(){
     document.querySelectorAll("input").forEach(i => i.value = "");
+    document.getElementById("availability").value = "Available";
 }
 
 /* EXPORT EXCEL */
 function exportExcel(){
+    if (diamonds.length === 0) {
+        showToast('No diamonds to export!', 'error');
+        return;
+    }
 
     const data = diamonds.map(d => ({
         "Stock ID": d.stockId,
         "Availability": d.availability,
-        "Shape": d.shape,
+        "Shape": d.shape || '',
         "CRT": d.crt,
-        "Color": d.color,
-        "Purity": d.purity,
-        "Cut": d.cut,
-        "Lab": d.lab,
-        "Certificate": d.certNo,
+        "Color": d.color || '',
+        "Purity": d.purity || '',
+        "Cut": d.cut || '',
+        "Lab": d.lab || '',
+        "Certificate": d.certNo || '',
         "Per CT": d.perCtPrice,
-        "Total": d.totalPrice
+        "Total": d.totalPrice.toFixed(2)
     }));
 
     const ws = XLSX.utils.json_to_sheet(data);
-    const wb = XLSX.utils.book_new();
+    
+    // Set column widths
+    ws['!cols'] = [
+        { wch: 12 },
+        { wch: 12 },
+        { wch: 10 },
+        { wch: 10 },
+        { wch: 10 },
+        { wch: 10 },
+        { wch: 10 },
+        { wch: 10 },
+        { wch: 15 },
+        { wch: 12 },
+        { wch: 12 }
+    ];
 
+    const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Diamonds");
 
-    XLSX.writeFile(wb, "diamond_inventory.xlsx");
+    XLSX.writeFile(wb, `diamond_inventory_${new Date().toISOString().split('T')[0]}.xlsx`);
+    showToast('Excel file exported successfully!');
 }
 
+// Keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && e.ctrlKey) {
+        addDiamond();
+    }
+});
+
+// Initialize
 render();
 </script>
 
