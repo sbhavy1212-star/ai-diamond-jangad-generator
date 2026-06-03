@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M & M DIAMOND - Access Portal</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1000px;
+    width: 100%;
+}
+
+.header {
+    text-align: center;
+    color: white;
+    margin-bottom: 50px;
+}
+
+.header h1 {
+    font-size: 3em;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.header p {
+    font-size: 1.2em;
+    opacity: 0.9;
+}
+
+.portal-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.portal-card {
+    background: white;
+    border-radius: 16px;
+    padding: 40px 30px;
+    text-align: center;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.portal-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.3);
+}
+
+.icon {
+    font-size: 4em;
+    margin-bottom: 20px;
+}
+
+.portal-card h2 {
+    font-size: 1.8em;
+    color: #2d3748;
+    margin-bottom: 15px;
+}
+
+.portal-card p {
+    color: #666;
+    margin-bottom: 25px;
+    line-height: 1.6;
+}
+
+.features {
+    text-align: left;
+    background: #f8f9ff;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    font-size: 0.95em;
+}
+
+.features li {
+    list-style: none;
+    padding: 8px 0;
+    color: #555;
+}
+
+.features li:before {
+    content: "✓ ";
+    color: #11998e;
+    font-weight: bold;
+    margin-right: 8px;
+}
+
+.btn {
+    display: inline-block;
+    padding: 15px 40px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.1em;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    width: 100%;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.btn-admin {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-admin:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(102, 126, 234, 0.4);
+}
+
+.btn-buyer {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    color: white;
+}
+
+.btn-buyer:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(17, 153, 142, 0.4);
+}
+
+.info-section {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    color: white;
+    padding: 30px;
+    border-radius: 12px;
+    text-align: center;
+}
+
+.info-section h3 {
+    font-size: 1.5em;
+    margin-bottom: 15px;
+}
+
+.credentials {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 20px;
+    font-family: 'Courier New', monospace;
+}
+
+.credential-item {
+    margin: 10px 0;
+    font-size: 1em;
+}
+
+.credential-item strong {
+    color: #ffeb3b;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .header h1 {
+        font-size: 2em;
+    }
+
+    .header p {
+        font-size: 1em;
+    }
+
+    .portal-grid {
+        gap: 20px;
+    }
+
+    .portal-card {
+        padding: 30px 20px;
+    }
+
+    .icon {
+        font-size: 3em;
+    }
+
+    .portal-card h2 {
+        font-size: 1.4em;
+    }
+}
+
+/* Modal for Admin Login */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-content {
+    background: white;
+    padding: 40px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+    font-size: 1.8em;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #2d3748;
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 1em;
+    transition: all 0.3s ease;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn-modal {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.btn-modal-login {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-modal-cancel {
+    background: #e0e0e0;
+    color: #2d3748;
+}
+
+.demo-note {
+    font-size: 0.85em;
+    color: #999;
+    text-align: center;
+    margin-top: 15px;
+}
+
+.toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 15px 25px;
+    border-radius: 6px;
+    color: white;
+    animation: slideIn 0.3s ease;
+    z-index: 1001;
+}
+
+.toast.success {
+    background: #11998e;
+}
+
+.toast.error {
+    background: #f5576c;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- HEADER -->
+    <div class="header">
+        <h1>💎 M & M DIAMOND</h1>
+        <p>Access Your Preferred Portal</p>
+    </div>
+
+    <!-- PORTAL SELECTION -->
+    <div class="portal-grid">
+
+        <!-- ADMIN PORTAL -->
+        <div class="portal-card">
+            <div class="icon">🔐</div>
+            <h2>Admin Dashboard</h2>
+            <p>Manage your diamond inventory with advanced analytics and reporting tools.</p>
+            <ul class="features">
+                <li>Complete Inventory Management</li>
+                <li>Real-time Analytics & Charts</li>
+                <li>Sales Tracking & Reports</li>
+                <li>Add/Edit/Delete Diamonds</li>
+                <li>Export to Excel</li>
+                <li>Admin Settings</li>
+            </ul>
+            <button class="btn btn-admin" onclick="showAdminLogin()">Access Admin</button>
+        </div>
+
+        <!-- BUYER PORTAL -->
+        <div class="portal-card">
+            <div class="icon">🛍️</div>
+            <h2>Buyer Dashboard</h2>
+            <p>Browse and manage your diamond inventory with a clean, user-friendly interface.</p>
+            <ul class="features">
+                <li>View All Diamonds</li>
+                <li>Search & Filter Inventory</li>
+                <li>Track Diamond Details</li>
+                <li>Carat & Value Tracking</li>
+                <li>Export Data to Excel</li>
+                <li>Easy-to-Use Interface</li>
+            </ul>
+            <a href="index.html" class="btn btn-buyer">Access Buyer Portal</a>
+        </div>
+
+    </div>
+
+    <!-- INFO SECTION -->
+    <div class="info-section">
+        <h3>🔑 Admin Access Information</h3>
+        <p>Click "Access Admin" to login with your credentials</p>
+        <div class="credentials">
+            <div class="credential-item">Username: <strong>admin</strong></div>
+            <div class="credential-item">Password: <strong>admin123</strong></div>
+        </div>
+    </div>
+
+</div>
+
+<!-- ADMIN LOGIN MODAL -->
+<div id="adminLoginModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">🔐 Admin Login</div>
+        <div class="form-group">
+            <label>Username</label>
+            <input type="text" id="adminUsername" placeholder="Enter username" value="admin">
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="adminPassword" placeholder="Enter password" value="admin123">
+        </div>
+        <div class="form-actions">
+            <button class="btn-modal btn-modal-login" onclick="adminLogin()">Login</button>
+            <button class="btn-modal btn-modal-cancel" onclick="closeAdminLogin()">Cancel</button>
+        </div>
+        <div class="demo-note">Demo credentials: admin / admin123</div>
+    </div>
+</div>
+
+<script>
+let adminUser = JSON.parse(localStorage.getItem("adminUser")) || { 
+    username: "admin", 
+    password: "admin123", 
+    name: "Admin" 
+};
+
+function showAdminLogin() {
+    document.getElementById("adminLoginModal").classList.add("active");
+    document.getElementById("adminUsername").focus();
+}
+
+function closeAdminLogin() {
+    document.getElementById("adminLoginModal").classList.remove("active");
+}
+
+function adminLogin() {
+    const username = document.getElementById("adminUsername").value;
+    const password = document.getElementById("adminPassword").value;
+
+    if (username === adminUser.username && password === adminUser.password) {
+        localStorage.setItem("currentAdmin", username);
+        showToast("Login successful! Redirecting...", "success");
+        setTimeout(() => {
+            window.location.href = "admin.html";
+        }, 500);
+    } else {
+        showToast("Invalid credentials!", "error");
+        document.getElementById("adminPassword").value = "";
+    }
+}
+
+function showToast(message, type = "success") {
+    const toast = document.createElement("div");
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+}
+
+// Enter key to login
+document.addEventListener("keypress", (e) => {
+    if (e.key === "Enter" && document.getElementById("adminLoginModal").classList.contains("active")) {
+        adminLogin();
+    }
+});
+
+// Close modal on Escape
+document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+        closeAdminLogin();
+    }
+});
+</script>
+
+</body>
+</html>
